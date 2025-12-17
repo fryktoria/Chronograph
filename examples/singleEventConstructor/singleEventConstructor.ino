@@ -1,7 +1,7 @@
 /*
 
-This example shows how to measure the average time between 
-subsequent executions of the same event in the program loops
+This example shows the use of a cnstructor with parameters
+for a timedEvent() case.
 Open the Serial Monitor to see the callback function printing the result
 
 */

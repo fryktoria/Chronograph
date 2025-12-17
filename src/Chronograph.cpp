@@ -11,6 +11,19 @@ Chronograph::Chronograph(unsigned int numMeasurementsToAverage, unsigned int num
 
 void Chronograph::begin(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float)) 
 {
+  beginNoCallback(numMeasurementsToAverage, numEventsToResult);
+  callback = userCallbackFunction;
+}
+
+
+void Chronograph::begin(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult) 
+{
+  beginNoCallback(numMeasurementsToAverage, numEventsToResult);
+}
+
+
+void Chronograph::beginNoCallback(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult) 
+{
   _numMeasurementsToAverage = numMeasurementsToAverage;
   _numEventsToResult = numEventsToResult;
   // We will not calculate a result before we collect at least the specified minimum number of measurement
@@ -22,8 +35,6 @@ void Chronograph::begin(unsigned int numMeasurementsToAverage, unsigned int numE
   _measurementCounter = 0;
   _validResult = false;
   currentAverageTime = 0;
-  callback = userCallbackFunction;
-
 }
 
 

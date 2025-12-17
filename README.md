@@ -136,6 +136,28 @@ if (chrono.validResult()) {
 ....
 ```
 
+### Working without a callback function
+It is possible to use the library without registering a callback function. In such a case, use a constructor without parameters and utilize the form of `begin()` without a callback, such as `begin(num1, num2)`.
+
+``` c++
+
+Chronograph chrono;
+
+void setup() {
+  chrono.begin(100, 500);
+}
+
+void loop() {
+  ....
+  if (chrono.validResult()) {
+    Serial.println(chrono.movingAverageTime());
+  }
+  ....
+}  
+```
+
+Please note that the library does not provide a constructor without a callback function. You have to use `begin()`.
+ 
 
 ## Supported microcontrollers
 This library does not depend on hardware specific code and does not have any peculiarities that would inhibit using on other platfors. Yet, it has been tested only on Arduino platform.

@@ -14,7 +14,8 @@ private:
   unsigned int _eventCounter;
   bool _validResult;
   void calculate(void);
-
+  void beginNoCallback(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult);
+  
 
 public:
   // Constructor without parameters. Need to call begin() later to set parameters
@@ -35,10 +36,14 @@ public:
   userCallbackFunction(result) : The callback function of the user space that will be activated every numEventsToResult                                                    
   */
   Chronograph(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result));
+  
+ 
 
   // Public methods and variables
   // begin() can be called in Arduino setup(), in case the constructor is called without parameters
   void begin(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result));
+  
+  void begin(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult);  
 
   // For timing the frequency of one single event in subsequent main program loops
   void timedEvent(void);
