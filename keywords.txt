@@ -1,0 +1,26 @@
+#######################################
+# Syntax Coloring Map for the
+# Chronograph library
+# https://github.com/fryktoria/Chronograph
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Chronograph	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+timedEvent	KEYWORD2
+setStart	KEYWORD2
+setEnd	KEYWORD2
+movingAverageTime	KEYWORD2
+validResult	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
