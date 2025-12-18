@@ -11,7 +11,7 @@ Open the Serial Monitor to see the callback function printing the result
 void printResult(float averageTime);
 
 // Use the constructor to pass parameters
-Chronograph chrono(500, 800, printResult);
+Chronograph chrono(500, 800, printResult, 1);
 
 void setup() {
   Serial.begin(115200);

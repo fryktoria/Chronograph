@@ -11,7 +11,7 @@ Chronograph chrono;
 
 void setup() {
   Serial.begin(115200);
-  chrono.begin(200, 800, printResult);
+  chrono.begin(200, 800, printResult, 1);
 }
 
 void loop() {
@@ -22,7 +22,7 @@ void loop() {
   delay(2);
 }
 
-void printResult(float averageTime) {
+void printResult(float averageTime, int id) {
   Serial.print ("Average time ");
   Serial.print(averageTime);
   Serial.println(" ms");

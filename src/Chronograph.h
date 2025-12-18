@@ -5,10 +5,11 @@
 class Chronograph 
 {
 private:
-  void (*callback)(float averageTime);  // Pointer to a function that returns void and takes arguments the result, i.e. the average time
+  void (*callback)(float averageTime, int id);  // Pointer to a function that returns void and takes arguments the result, i.e. the average time
   float _movingAverageTime;
   unsigned int _numMeasurementsToAverage;
   unsigned int _numEventsToResult;
+  int _id;
   unsigned long _lastEventTime;
   unsigned int _measurementCounter;
   unsigned int _eventCounter;
@@ -33,15 +34,17 @@ public:
   numEventsToResult:        The user registered callback function will be called every numEventsToResult. 
                             Please note that the callback function will be called for the first time
                             only after minMeasurementsToAverage measurements have been collected.
-  userCallbackFunction(result) : The callback function of the user space that will be activated every numEventsToResult                                                    
+  userCallbackFunction(result) : The callback function of the user space that will be activated 
+                                 every numEventsToResult   
+  id:                       An integer that is sent to the callback function, to distinguish between several Chronograph instances  
   */
-  Chronograph(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result));
+  Chronograph(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result, int id), int id);
   
  
 
   // Public methods and variables
   // begin() can be called in Arduino setup(), in case the constructor is called without parameters
-  void begin(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result));
+  void begin(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result, int id), int id);
   
   void begin(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult);  
 

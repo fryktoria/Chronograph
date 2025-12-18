@@ -5,17 +5,13 @@ An Arduino library to measure a moving average of the time required to execute p
 ## About Chronograph
 It is common during software development to measure the time that is required to run parts of the code. Extremely useful in code debugging, timing can provide insightful information about what the code does behind the scenes. In "normal" software which performs some sort of data processing, the program usually terminates and allows us to examine the duration between check points that we have set. Yet, in embedded systems, there is an endless loop that runs over and over, several hundreds or thousand times per second. If we try to measure a time duration in every iteration of the code, we will end up with thousands of results. Even worse, if we try to print those results or store them in some form of memory, we will interfere destructively in the operation of the system, because such printing operations take a large amount of time, perhaps even longer than the code we are debugging. 
 
+Without a doubt, the best tools to debug embedded systems are an oscilloscope or a digital analyzer, provided that the times that we want to measure cause a change in a system physical pin. In some cases, we might also be able to define a spare pin as a debugging output and control it in respect to the times that we want to measure. If there is not an oscilloscope or digital analyzer availabe, or there is no spare pin, a software solution such as the Chronograph library can provide a cost-effective and easy to implement solution.
+
 The Chronograph library adds a tool in our debugging arsenal, by providing us a way to measure the **average time** that it takes to run multiple iterations of our code. When we initiate the library, we decide how many measurements will be used to calculate this average. This is the `minMeasurementsToAverage` parameter. Our average time is actually a Moving Average, where each new measurement will be used to calculate a new average time. For that purpose and in order to keep the code simple and to avoid wasting memory space with buffers or circular queues, we use the formula `NewAverage = (newMeasurement + numberOfMeasurements * PreviousAverage)/(numberOfMeasurements + 1)`. It is not intuitive, but it can be proven mathematically that it produces the same result as if we have kept each individual measurement and calculated the average by summing and dividing. Please check https://en.wikipedia.org/wiki/Moving_average for the mathematical proof.
 
 We just need to understand that this formula calculates a **Cumulative Average** from the moment that we get the first measurement and until the number of our measurements reach the `minMeasurementsToAverage` parameter. Afterwards, each new measurement will contribute to the calculation of the moving average, using an average of a fixed number of `minMeasurementsToAverage` measurements. During the first initial stage, the calculation will produce an unusable value. Consider that if our process requires exactly 10ms, the first calculation will produce 5ms, since we average between a starting 0 and a value of 10. The second calculation will produce 6.67, the third 7.5, increasing after iteration and moving gradually towards the value of 10, without actually reaching it. This functionality is somewhat similar to the **Dichotomy paradox** of the philosopher Zeno (see  https://en.wikipedia.org/wiki/Zeno%27s_paradoxes). Doing the math, the process will go to 9.8 after 50 iterations. It is not exact but for a large amount of iterations, we will have a value that will allow us to make deductions and pinpoint problems of our code. The library will never trigger the callback function before the number of measurements reach `minMeasurementsToAverage`.
 
 As stated above, printing multiple times may ruin time-critical operations of our code. Therefore, we need to get the result as rarely as possible. The parameter `numEventsToResult` controls how often we get a result, in the sense that the callback function is called every `numEventsToResult` iterations. Since we consider that the first `minMeasurementsToAverage` will not produce an acceptable moving average value, it is self evident that `numEventsToResult` must be at least equal or higher than `minMeasurementsToAverage`. 
-
-
-
-
-
-
 
 
 ## Reference
@@ -33,17 +29,10 @@ Care should be exercised when using the constructor with parameters, regarding t
   // Arduino programs should make sure that the userCallbackFunction has been defined before the call to the constructor
   // or it has been declared via a function prototype
 
+   
 
-  minMeasurementsToAverage: The moving average is calculated using minMeasurementsToAverage measurements. Also,
-                            at least minMeasurementsToAverage are required in order to produce a valid result.
-                            After minMeasurementsToAverage measurements are received, every single new measurement
-                            will contribute to the calculation of a new moving average time
-  numEventsToResult:        The user registered callback function will be called every numEventsToResult. 
-                            Please note that the callback function will be called for the first time
-                            only after minMeasurementsToAverage measurements have been collected.
-  userCallbackFunction(result) : The callback function of the user space that will be activated every numEventsToResult                                                    
   */
-  Chronograph(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result));
+  Chronograph(unsigned int minMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float result, int id), int id);
 ```
 
 ### Parameters
@@ -56,7 +45,8 @@ The parameters can be set via the constructor or via the `begin()` method.
   numEventsToResult:        The user registered callback function will be called every numEventsToResult. 
                             Please note that the callback function will be called for the first time
                             only after minMeasurementsToAverage measurements have been collected.
-  userCallbackFunction(result) : The callback function of the user space that will be activated every numEventsToResult                                                    
+  userCallbackFunction(result) : The callback function of the user space that will be activated every numEventsToResult     
+  id:                       An integer that is sent to the callback function, to distinguish between several Chronograph instances    
 ```
 
 ### Usage
@@ -115,11 +105,11 @@ The suggested method is to use a callback function. In the example below, the ca
 ``` c++
 void setup() {
   Serial.begin(115200);
-  chrono.begin(500, 800, printResult);
+  chrono.begin(500, 800, printResult, 1);
 }
 
 
-void printResult(float averageTime) {
+void printResult(float averageTime, int id) {
   Serial.print ("Average time ");
   Serial.print(averageTime);
   Serial.println(" ms");
@@ -135,6 +125,11 @@ if (chrono.validResult()) {
 }
 ....
 ```
+
+### Multiple instances
+If we wish to measure multiple durations, we can create multiple instances of the Chronograph class. See example `twoInstances.ino`. **We can register the same callback function to multiple instances**. In such case, we can distinguish the instance that produced the result using the `id` parameter which is passed on instantiation of the class or with `begin()`. 
+
+**Please note that the library does not perform any check on the id provided by the user. If the user sets the same id to multiple classes, they will all activate the callback with that same id.**
 
 ### Working without a callback function
 It is possible to use the library without registering a callback function. In such a case, use a constructor without parameters and utilize the form of `begin()` without a callback, such as `begin(num1, num2)`.

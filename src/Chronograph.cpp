@@ -3,16 +3,17 @@
 
 Chronograph::Chronograph(void) {}
 
-Chronograph::Chronograph(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float)) 
+Chronograph::Chronograph(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float, int), int id) 
 {
-  begin(numMeasurementsToAverage, numEventsToResult, userCallbackFunction);
+  begin(numMeasurementsToAverage, numEventsToResult, userCallbackFunction, id);
 }
 
 
-void Chronograph::begin(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float)) 
+void Chronograph::begin(unsigned int numMeasurementsToAverage, unsigned int numEventsToResult, void (*userCallbackFunction)(float, int), int id) 
 {
   beginNoCallback(numMeasurementsToAverage, numEventsToResult);
   callback = userCallbackFunction;
+  _id = id;
 }
 
 
@@ -85,7 +86,7 @@ void Chronograph::calculate(void)
 
     // and run the user registered function 
     if (callback) {
-      callback(currentAverageTime); // Call user’s registered function
+      callback(currentAverageTime, _id); // Call user’s registered function
     }  
   }
 }
